@@ -1,7 +1,7 @@
 import 'package:rxdart/rxdart.dart';
 
 import '../mixins/validators.dart';
-import '../resources/rest_api.dart';
+import '../resources/firebase_store_conn.dart';
 
 class SignupBloc with Validator {
   RestAPI _api = RestAPI();

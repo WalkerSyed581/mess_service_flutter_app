@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:rxdart/rxdart.dart';
 
 import '../models/user_model.dart';
-import '../resources/rest_api.dart';
+import '../resources/firebase_store_conn.dart';
 
 class UserBloc {
   final _userFetch = BehaviorSubject<dynamic>();

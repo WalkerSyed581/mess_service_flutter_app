@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// import '../blocs/login_provider.dart';
-import '../blocs/login_bloc.dart';
-import '../blocs/user_bloc.dart';
 
 import '../widgets/login/card.dart';
 
@@ -15,12 +12,11 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
-    LoginBloc bloc = Provider.of<LoginBloc>(context);
     print(MediaQuery.of(context).size);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Login  '),
         elevation: .1,
         backgroundColor: Theme.of(context).primaryColor,
       ),
