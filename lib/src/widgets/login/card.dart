@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mess_service/src/widgets/form_field_widget.dart';
 import 'package:provider/provider.dart';
 
-import '../../blocs/login_bloc.dart';
-import '../../blocs/user_bloc.dart';
+import '../../validation/login_form_provider.dart';
 
 import '../misc/stream_text_field.dart';
 import '../misc/submit_button.dart';
@@ -14,20 +14,22 @@ class LoginCard extends StatefulWidget {
 
 class _LoginCardState extends State<LoginCard> {
   int _index = 0;
+  final _formKey = GlobalKey<FormState>();
+  late FormProvider _formProvider;
 
   @override
   Widget build(BuildContext context) {
-    LoginBloc bloc = Provider.of<LoginBloc>(context);
+    _formProvider = Provider.of<FormProvider>(context);
     return IndexedStack(
       index: _index,
       children: <Widget>[
-        loginCard(bloc, context),
+        loginCard(context),
         signupCard(context),
       ],
     );
   }
 
-  Widget loginCard(LoginBloc bloc, BuildContext context) {
+  Widget loginCard(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 15),
@@ -41,26 +43,36 @@ class _LoginCardState extends State<LoginCard> {
         ),
         imageField(
           Icons.person,
-          StreamTextField(
+          CustomFormField(
             hintText: 'you@example.com',
-            labelText: 'Email address',
-            stream: bloc.emailStream,
-            onChanged: bloc.changeEmail,
-            textInputType: TextInputType.emailAddress,
+            onChanged: _formProvider.validateEmail,
+            errorText: _formProvider.email.error,
           ),
         ),
         imageField(
           Icons.lock_outlined,
-          StreamTextField(
+          CustomFormField(
             hintText: 'Password',
-            labelText: 'Password',
-            stream: bloc.passwordStream,
-            onChanged: bloc.changePassword,
-            textInputType: TextInputType.visiblePassword,
-            obscureText: true,
+            onChanged: _formProvider.validatePassword,
+            errorText: _formProvider.password.error,
           ),
         ),
-        submitButton(bloc, context),
+        Consumer<FormProvider>(
+            builder: (context, model, child) {
+              return ElevatedButton(
+                onPressed: () {
+                  if (model.validate) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => SuccessPage(),
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Submit'),
+              );
+            }
+        ),
         const SizedBox(height: 10),
         Text(
           "Forgot password?",
@@ -113,28 +125,6 @@ class _LoginCardState extends State<LoginCard> {
     );
   }
 
-  Widget submitButton(LoginBloc bloc, BuildContext context) {
-    return StreamBuilder(
-        stream: bloc.submitValid,
-        builder: (context, snapshot) {
-          return ElevatedButton(
-            onPressed: snapshot.hasData
-                ? () {
-                    bloc.submit(
-                        context, Provider.of<UserBloc>(context, listen: false));
-                  }
-                : null,
-            child: const Text(
-              'Log in',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          );
-        });
-  }
 
   Widget indexButton(String text, IconData iconData) {
     return Row(

@@ -1,43 +1,51 @@
 import 'dart:convert' show json;
 
 import 'address_model.dart';
+import 'department_model.dart';
 
-enum UserRole {
-  ROLE_PATIENT,
-  ROLE_DOCTOR,
-  ROLE_ADMIN,
-  ROLE_CG,
+enum Designation {
+  STAFF,
+  STUDENT,
+  TEACHER,
 }
 
-List<UserRole> _getRoles(roles) {
-  List<UserRole> list = [];
-  for (final item in roles) {
-    list.add(UserRole.values
-        .firstWhere((e) => e.toString() == 'UserRole.' + item['name']));
+class AdminModel{
+  String firstName, lastName;
+
+  AdminModel(this.firstName, this.lastName);
+
+  @override
+  String toString() {
+    return 'AdminModel{firstName: $firstName, lastName: $lastName}';
   }
-  return list;
+
+  AdminModel.fromJson(Map<String, dynamic> parsedJson)
+      : firstName = parsedJson['firstName'] ?? "NO NAME FROM API",
+        lastName = parsedJson['lastName'] ?? "NO NAME FROM API";
+
+
+}
+
+Designation _getDesignation(designation) {
+  return  Designation.values.firstWhere((e) => e.toString() == 'Designation.' + designation);;
 }
 
 class UserModel {
-  String firstName, lastName, email, password, phoneNo, cnic;
+  String firstName, lastName, email, password, phoneNo;
+  int id;
   // DateTime dob;
-  List<UserRole> roles;
-  AddressModel address;
-  int id, age;
-  UserModel? cgUser;
+  Designation designation;
+  DepartmentModel dept;
 
   UserModel(
     this.firstName,
     this.lastName,
     this.email,
     this.password,
-    this.phoneNo,
-    this.cnic,
-    // this.dob,
-    this.address,
     this.id,
-    this.age,
-    this.roles,
+    this.phoneNo,
+    this.designation,
+    this.dept
   );
 
   UserModel.fromJson(Map<String, dynamic> parsedJson)
@@ -46,17 +54,12 @@ class UserModel {
         email = parsedJson['email'] ?? "NO EMAIL FROM API",
         password = parsedJson['password'] ?? "NO PASSWORD FROM API",
         phoneNo = parsedJson['phone_no'] ?? "NO PHONENO FROM API",
-        cnic = parsedJson['cnic'] ?? "NO CNIC FROM API",
-        address = AddressModel.fromJson(parsedJson['address']),
         id = parsedJson['id'] ?? -999,
-        age = parsedJson['age'] ?? -9999,
-        roles = _getRoles(parsedJson['roles']),
-        cgUser = parsedJson['cg_user'] == null
-            ? null
-            : UserModel.fromJson(parsedJson['cg_user']);
+        designation = _getDesignation(parsedJson['roles']),
+        dept = DepartmentModel.fromJson(parsedJson['dept']);
 
   @override
   String toString() {
-    return "$id, $firstName, $lastName, $email, $password, $phoneNo, $cnic, $age, $address, $roles";
+    return "$id, $firstName, $lastName, $email, $password, $phoneNo";
   }
 }

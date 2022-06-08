@@ -1,42 +1,32 @@
-import 'dart:convert' show json;
-import 'package:http/http.dart';
-// import 'package:http/testing.dart';
+import 'dart:io';
 
-import '../models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart';
+import 'package:path/path.dart' as path;
 
-class RestAPI {
-  final Client client = Client();
-  // final String _hostAddress = "http://10.0.2.2:8080";
-  // final String _hostAddress = "http://127.0.0.1:8080";
-  final String _hostAddress = "https://digicare-rest.herokuapp.com";
+import '../app.dart';
 
-  Future<String?> authenticate(String email, String password) async {
-    Response response = await client.post(
-      Uri.parse("$_hostAddress/authenticate"),
-      headers: <String, String>{"Content-Type": "application/json"},
-      body: '{"email": "$email","password": "$password"}',
-    );
 
-    print(response.statusCode);
-    if (response.statusCode != 200) {
-      return null;
-    }
+signOut(ApplicationState authNotifier, BuildContext context) async {
+  await FirebaseAuth.instance.signOut();
 
-    return json.decode(response.body)['token'];
+  authNotifier.setUser(null);
+  print('log out');
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (BuildContext context) {
+      return LoginPage();
+    }),
+  );
+}
+
+initializeCurrentUser(AuthNotifier authNotifier, BuildContext context) async {
+  FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
+  if (firebaseUser != null) {
+    authNotifier.setUser(firebaseUser);
+    await getUserDetails(authNotifier);
   }
-
-  Future<UserModel> fetchUser(String jwt, String email) async {
-    await Future.delayed(const Duration(seconds: 2));
-    Response response = await client.get(
-      Uri.parse("$_hostAddress/users/email/$email"),
-      headers: <String, String>{
-        "Authorization": "Bearer $jwt",
-      },
-    );
-    print("${response.body} USER API");
-    final user = UserModel.fromJson(json.decode(response.body));
-    print(user);
-    return user;
-  }
-
 }

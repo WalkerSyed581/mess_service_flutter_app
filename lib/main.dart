@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 import 'src/auth/authentication.dart';
 import 'src/widgets/misc_widgets.dart';
 import 'src/app.dart';
+import 'package:mess_service/src/providers/application_state_provider.dart';
 
 void main() {
   runApp(
